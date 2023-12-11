@@ -1,6 +1,6 @@
 ---
 title: Creating Portfolio Website Like Developers
-publishDate: 2023-12-11 18:26:00
+publishDate: '2023-12-11 18:26:00'
 image:
     url: /assets/stock-3.jpg
     alt: 'Test picture'
