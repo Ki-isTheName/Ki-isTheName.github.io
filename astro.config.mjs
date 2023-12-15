@@ -12,5 +12,6 @@ export default defineConfig({
     }
   },
   site: 'https://zakizakaria-cybersec.github.io',
+  styles: ['/Users/zaki/Desktop/GitPageFolio/zakizakaria/src/styles/global.css'],
   integrations: [tailwind()]
 });

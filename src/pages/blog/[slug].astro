@@ -12,17 +12,38 @@ import Pill from '../../components/Pill.astro';
 import { contentfulClient } from "../../lib/contentful";
 import { documentToHtmlString } from "@contentful/rich-text-html-renderer";
 import type { BlogPost } from "../../lib/contentful";
+import { BLOCKS, MARKS } from '@contentful/rich-text-types';
 
 export async function getStaticPaths() {
   const entries = await contentfulClient.getEntries<BlogPost>({
     content_type: "blogPost",
   });
 
+  const options = {
+  renderNode: {
+    [BLOCKS.TABLE]: (node, next) => (
+      `<div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+	  <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">${next(node.content)}</table>
+	  </div>
+	  `
+    ),
+	[BLOCKS.TABLE_HEADER_CELL]: (node, next) => (
+	  `<th scope="col" class="px-6 py-3">${next(node.content)}</th>`
+	),
+	[BLOCKS.TABLE_ROW]: (node, next) => (
+      `<tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">${next(node.content)}</tr>`
+    ),
+    [BLOCKS.TABLE_CELL]: (node, next) => (
+      `<td class="px-6 py-4">${next(node.content)}</td>`
+    ),
+  },
+};
+
   const pages = entries.items.map((item) => ({
     params: { slug: item.fields.slug },
     props: {
       title: item.fields.title,
-      content: documentToHtmlString(item.fields.content),
+      content: documentToHtmlString(item.fields.content,options),
       date: new Date(item.fields.date).toLocaleDateString(),
 	  description: item.fields.description,
 	  slug: item.fields.slug,
@@ -31,10 +52,7 @@ export async function getStaticPaths() {
   }));
   return pages;
 }
-// const { entry } = Astro.props;
-// const { Content } = await entry.fields.content.content.render();
 const { title, content, date, description, slug, tags } = Astro.props;
-// const { Content } = await content[Symbol];
 ---
 
 <BaseLayout title={title} description={description}>
@@ -54,13 +72,12 @@ const { title, content, date, description, slug, tags } = Astro.props;
 				</div>
 			</header>
 			<main class="wrapper">
-				<div class="stack gap-10 content">
-					<!-- {entry.data.image.url && <img src={entry.data.image.url} alt={entry.data.image.alt || ''} />} -->
-					<!-- <div class="content">
-						
-					</div> -->
-					<article set:html={content} />
-				</div>
+				<div class="stack gap-10">
+					<div class="content">
+						<article class="space-y-4" set:html={content}/>
+					</div>
+					
+				</div>				  
 			</main>
 			
 		</div>
