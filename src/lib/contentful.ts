@@ -1,4 +1,4 @@
-import contentful, { EntryFieldTypes } from "contentful";
+import contentful, { type EntryFieldTypes } from "contentful";
 
 export interface BlogPost {
   contentTypeId: "blogPost",

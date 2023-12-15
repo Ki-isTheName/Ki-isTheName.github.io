@@ -1,6 +1,6 @@
 ---
 import { getRelativeLocaleUrl } from 'astro:i18n';
-import { type CollectionEntry, getCollection } from 'astro:content';
+// import { type CollectionEntry, getCollection } from 'astro:content';
 
 import BaseLayout from '../../layouts/BaseLayout.astro';
 
@@ -8,23 +8,6 @@ import ContactCTA from '../../components/ContactCTA.astro';
 import Hero from '../../components/Hero.astro';
 import Icon from '../../components/Icon.astro';
 import Pill from '../../components/Pill.astro';
-
-// interface Props {
-// 	entry: CollectionEntry<'blogPost'>;
-// }
-
-// This is a dynamic route that generates a page for every Markdown file in src/content/
-// Read more about dynamic routes and this `getStaticPaths` function in the Astro docs:
-// https://docs.astro.build/en/core-concepts/routing/#dynamic-routes
-// export async function getStaticPaths() {
-// 	const blog = await getCollection('blog');
-// 	return blog.map((entry) => ({
-// 		params: { slug: entry.slug },
-// 		props: { entry },
-// 	}));
-// }
-
-
 
 import { contentfulClient } from "../../lib/contentful";
 import { documentToHtmlString } from "@contentful/rich-text-html-renderer";
@@ -41,47 +24,47 @@ export async function getStaticPaths() {
       title: item.fields.title,
       content: documentToHtmlString(item.fields.content),
       date: new Date(item.fields.date).toLocaleDateString(),
+	  description: item.fields.description,
+	  slug: item.fields.slug,
+	  tags: item.metadata.tags
     },
   }));
   return pages;
 }
 // const { entry } = Astro.props;
-// const { Content,Title, Date } = await entry.render();
-const { content, title, date } = Astro.props;
+// const { Content } = await entry.fields.content.content.render();
+const { title, content, date, description, slug, tags } = Astro.props;
+// const { Content } = await content[Symbol];
 ---
 
-<BaseLayout title={title} description={content}>
+<BaseLayout title={title} description={description}>
 	<div class="stack gap-20">
-		{content}
-		<!-- <body>
-			<h1>{title}</h1>
-			<time>{date}</time>
-			<article set:html={content} />
-		</body> -->
-		<!-- <div class="stack gap-15">
+		<div class="stack gap-15">
 			<header>
 				<div class="wrapper stack gap-2">
-					<a class="back-link" href="/work/"><Icon icon="arrow-left" /> Work</a>
-					<Hero title={entry.data.title} align="start">
+					<a class="back-link" href="/blog/"><Icon icon="arrow-left" /> Blog</a>
+					<Hero title={title} align="start">
 						<div class="details">
 							<div class="tags">
-								{entry.data.tags.map((t) => <Pill>{t}</Pill>)}
+								{tags.map((t) => <Pill>{t.sys.id}</Pill>)}
 							</div>
-							<p class="description">{entry.data.description}</p>
+							<p class="description">{description}</p>
 						</div>
 					</Hero>
 				</div>
 			</header>
 			<main class="wrapper">
 				<div class="stack gap-10 content">
-					{entry.data.image.url && <img src={entry.data.image.url} alt={entry.data.image.alt || ''} />}
-					<div class="content">
-						<Content />
-					</div>
+					<!-- {entry.data.image.url && <img src={entry.data.image.url} alt={entry.data.image.alt || ''} />} -->
+					<!-- <div class="content">
+						
+					</div> -->
+					<article set:html={content} />
 				</div>
 			</main>
+			
 		</div>
-		<ContactCTA /> -->
+		<ContactCTA />
 	</div>
 </BaseLayout>
 

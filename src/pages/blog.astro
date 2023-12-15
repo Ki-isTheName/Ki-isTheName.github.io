@@ -7,11 +7,26 @@ import ContactCTA from '../components/ContactCTA.astro';
 import PortfolioPreview from '../components/PortfolioPreview.astro';
 import Hero from '../components/Hero.astro';
 import Grid from '../components/Grid.astro';
+import { contentfulClient } from "../lib/contentful";
+import type { BlogPost } from "../lib/contentful";
 
 // const blogEntries = (await getCollection('blog')).sort(
 // 	(a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf()
 // );
 const blogEntries = await getCollection('blog');
+const entries = await contentfulClient.getEntries<BlogPost>({
+  content_type: "blogPost",
+});
+
+const posts = entries.items.map((item) => {
+  const { title, date, description, slug } = item.fields;
+  return {
+    title,
+    slug,
+    description,
+    date: new Date(date).toLocaleDateString()
+  };
+});
 ---
 
 <BaseLayout
@@ -22,17 +37,18 @@ const blogEntries = await getCollection('blog');
 		<main class="wrapper stack gap-8">
 			<Hero
 				title="My Blog"
-				tagline="See my most recent projects below to get an idea of my past experience."
+				tagline="Sharing my knowledge and experiences"
 				align="start"
 			/>
 			<Grid variant="offset">
 				{
-					blogEntries.map((blogPostEntry) => (
+					posts.map((post) => (
 					<li>
-						<a href={`/blog/${blogPostEntry.slug}`}>{blogPostEntry.data.title}</a>
-						<time datetime={blogPostEntry.data.publishDate.toString()}>
-							{blogPostEntry.data.publishDate.toString()}
+						<a href={`/blog/${post.slug}`}>{post.title}</a>
+						<time datetime={post.date}>
+							{post.date}
 						</time>
+						<img>
 					</li>
 					))
 				}
