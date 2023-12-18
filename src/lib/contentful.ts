@@ -7,7 +7,8 @@ export interface BlogPost {
     content: EntryFieldTypes.RichText,
     date: EntryFieldTypes.Date,
     description: EntryFieldTypes.Text,
-    slug: EntryFieldTypes.Text
+    slug: EntryFieldTypes.Text,
+    feature_image: EntryFieldTypes.AssetLink
   }
 }
 

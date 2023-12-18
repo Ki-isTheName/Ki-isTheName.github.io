@@ -25,8 +25,8 @@ const iconLinks: { label: string; href: string; icon: keyof typeof iconPaths }[]
 <nav>
 	<div class="menu-header">
 		<a href="/" class="site-title">
-			<Icon icon="terminal-window" color="var(--accent-regular)" size="1.6em" gradient />
-			 Jeanine White
+			<Icon icon="terminal-window" color="bg-accent" size="1.6em" gradient />
+			 Zaki Zakaria
 		</a>
 		<menu-button>
 			<template>
@@ -41,7 +41,7 @@ const iconLinks: { label: string; href: string; icon: keyof typeof iconPaths }[]
 		<ul class="nav-items">
 			{
 				textLinks.map(({ label, href }) => (
-					<li>
+					<li >
 						<a
 							aria-current={Astro.url.pathname === href}
 							class:list={[
@@ -186,8 +186,10 @@ const iconLinks: { label: string; href: string; icon: keyof typeof iconPaths }[]
 		border-radius: 999rem;
 		padding: 0.5rem;
 		font-size: 1.5rem;
-		color: var(--gray-300);
-		background: radial-gradient(var(--gray-900), var(--gray-800) 150%);
+		@apply text-accent;
+		/* color: var(--gray-300); */
+		@apply bg-accent;
+		/* background: radial-gradient(var(--gray-900), var(--gray-800) 150%); */
 		box-shadow: var(--shadow-md);
 	}
 
@@ -263,7 +265,9 @@ const iconLinks: { label: string; href: string; icon: keyof typeof iconPaths }[]
 		display: flex;
 		padding: var(--icon-padding);
 		text-decoration: none;
-		color: var(--accent-dark);
+		@apply text-accent;
+		/* @apply bg-accent; */
+		/* color: var(--accent-dark); */
 		transition: color var(--theme-transition);
 	}
 
@@ -330,12 +334,15 @@ const iconLinks: { label: string; href: string; icon: keyof typeof iconPaths }[]
 		.link:hover,
 		.link:focus {
 			color: var(--gray-100);
-			background-color: var(--accent-subtle-overlay);
+			/* background-color: var(--accent-subtle-overlay); */
+			@apply bg-hover;
 		}
 
 		.link.active {
-			color: var(--accent-text-over);
-			background-color: var(--accent-regular);
+			/* color: var(--accent-text-over); */
+			/* background-color: var(--accent-regular); */
+			@apply text-secondary;
+			@apply bg-accent;
 		}
 
 		.menu-footer {
