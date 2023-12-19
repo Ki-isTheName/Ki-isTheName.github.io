@@ -1,9 +1,38 @@
 ---
 import Icon from './Icon.astro';
+
+//contentful portion
+import { contentfulClient } from "../lib/contentful";
+import type { Qualifications } from "../lib/contentful";
+
+const entries = await contentfulClient.getEntries<Qualifications>({
+  content_type: "qualifications",
+});
+
+const qualifications = entries.items.map((item) => {
+  const { title, description, icon } = item.fields;
+  return {
+    title,
+    description,
+	icon
+  };
+});
+
+// const { title, description } = Astro.props;
 ---
 
 <section class="box skills">
-	<div class="stack gap-2 lg:gap-4">
+	{
+		qualifications.map((qualification) =>(
+		<div class="stack gap-2 lg:gap-4">
+			<Icon icon={qualification.icon} color="var(--accent-regular)" size="2.5rem" gradient />
+			<h2>{qualification.title}</h2>
+			<p>{qualification.description}</p>
+		</div>
+		))
+	}
+	
+	<!-- <div class="stack gap-2 lg:gap-4">
 		<Icon icon="terminal-window" color="var(--accent-regular)" size="2.5rem" gradient />
 		<h2>Full Stack</h2>
 		<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod.</p>
@@ -17,7 +46,7 @@ import Icon from './Icon.astro';
 		<Icon icon="strategy" color="var(--accent-regular)" size="2.5rem" gradient />
 		<h2>Strategy-Minded</h2>
 		<p>Urna porttitor rhoncus dolor purus non enim praesent ornare.</p>
-	</div>
+	</div> -->
 </section>
 
 <style>

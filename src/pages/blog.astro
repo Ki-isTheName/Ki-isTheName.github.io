@@ -10,20 +10,22 @@ import Grid from '../components/Grid.astro';
 import { contentfulClient } from "../lib/contentful";
 import type { BlogPost } from "../lib/contentful";
 
-const blogEntries = await getCollection('blog');
 const entries = await contentfulClient.getEntries<BlogPost>({
   content_type: "blogPost",
 });
 
 const posts = entries.items.map((item) => {
-  const { title, date, description, slug } = item.fields;
+//   const { title, date, description, slug, feature_image} = item.fields;
   return {
-    title,
-    slug,
-    description,
-    date: new Date(date).toLocaleDateString()
+    title: item.fields.title,
+    slug: item.fields.slug,
+    description: item.fields.description,
+    // date: new Date(date).toLocaleDateString(),
+	date: item.fields.date,
+	featureImage: item.fields.featureImage,
   };
 });
+
 ---
 
 <BaseLayout

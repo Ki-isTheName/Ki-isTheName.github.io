@@ -40,6 +40,7 @@ export async function getStaticPaths() {
 };
 
   const pages = entries.items.map((item) => ({
+
     params: { slug: item.fields.slug },
     props: {
       title: item.fields.title,

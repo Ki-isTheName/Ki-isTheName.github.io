@@ -1,29 +1,20 @@
 ---
 import { contentfulClient } from "../lib/contentful";
-import type { BlogPost } from "../lib/contentful";
 
-// const blogEntries = await getCollection('blog');
-const entries = await contentfulClient.getEntries<BlogPost>({
-  content_type: "blogPost",
-});
+const { title, slug, description, date, featureImage } = Astro.props.post;
 
-const post = entries.items.map((item) => {
-  const { title, date, description, slug, feature_image } = item.fields;
-  return {
-    title,
-    slug,
-    description,
-    date: new Date(date).toLocaleDateString(),
-    feature_image
-  };
-});
+const assetId = featureImage.sys.id;
 
-const { title, slug, description, date, feature_image } = Astro.props.post;
+// Use the ID to fetch the actual Asset
+const asset = await contentfulClient.getAsset(assetId);
+
+// Extract the URL from the fetched asset
+const featureImageURL = `https:${asset.fields.file?.url}`;
 ---
 
 <a class="card" href={`/blog/${slug}`}>
 	<span class="title">{title}</span>
-	<img src={feature_image} loading="lazy" decoding="async" />
+	<img src={featureImageURL} alt={description} loading="lazy" decoding="async" />
 </a>
 
 <style>

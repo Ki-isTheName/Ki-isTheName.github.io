@@ -8,7 +8,16 @@ export interface BlogPost {
     date: EntryFieldTypes.Date,
     description: EntryFieldTypes.Text,
     slug: EntryFieldTypes.Text,
-    feature_image: EntryFieldTypes.AssetLink
+    featureImage: EntryFieldTypes.AssetLink
+  }
+}
+
+export interface Qualifications {
+  contentTypeId: "qualifications",
+  fields: {
+    title: EntryFieldTypes.Text,
+    description: EntryFieldTypes.Text,
+    icon: EntryFieldTypes.Text
   }
 }
 
