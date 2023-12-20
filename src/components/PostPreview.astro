@@ -4,10 +4,8 @@ import { contentfulClient } from "../lib/contentful";
 const { title, slug, description, date, featureImage } = Astro.props.post;
 
 const assetId = featureImage.sys.id;
-
 // Use the ID to fetch the actual Asset
 const asset = await contentfulClient.getAsset(assetId);
-
 // Extract the URL from the fetched asset
 const featureImageURL = `https:${asset.fields.file?.url}`;
 ---

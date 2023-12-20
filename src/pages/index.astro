@@ -16,10 +16,29 @@ import PortfolioPreview from '../components/PortfolioPreview.astro';
 import ContactCTA from '../components/ContactCTA.astro';
 import Skills from '../components/Skills.astro';
 
+import { contentfulClient } from "../lib/contentful";
+
 // Content Fetching: List four most recent work projects
 const projects = (await getCollection('work'))
 	.sort((a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf())
 	.slice(0, 4);
+
+const assets = await contentfulClient.getAssets();
+// const imagesUrl = assets.items.filter((asset) => asset.fields.file?.url);
+// const imagesUrl = assets.items.filter((asset) => asset.fields.file?.url).map((asset) => asset.fields.file.url);
+const desiredTag = 'logo';
+
+const imagesUrl = assets.items
+  .filter((asset) => {
+    // Check if the asset has a valid URL, is of type "image," and has the desired tag
+    return (
+      asset.fields.file?.url &&
+      asset.fields.file.contentType.startsWith('image/') &&
+      asset.metadata.tags.some((tag) => tag.sys && tag.sys.id == desiredTag)
+    );
+  })
+  .map((asset) => asset.fields.file?.url);
+
 ---
 
 <BaseLayout>
@@ -79,23 +98,22 @@ const projects = (await getCollection('work'))
 
 			<section class="section with-background bg-variant">
 				<header class="section-header stack gap-2 lg:gap-4">
-					<h3>Mentions</h3>
+					<h3>Certifications</h3>
 					<p>
-						I have been fortunate enough to receive praise for my work in several publications. Take
-						a look below to learn more.
+						These are the certifications I have obtained throughout the years.
 					</p>
 				</header>
 
 				<div class="gallery">
-					<Grid variant="small">
-						{
-							['Medium', 'BuzzFeed', 'The Next Web', 'awwwards.', 'TechCrunch'].map((brand) => (
-								<li class="mention-card">
-									<p>{brand}</p>
+					{
+						<ul class="flex flex-wrap justify-center">
+							{imagesUrl.map((image, index) => (
+								<li class="w-1/2 sm:w-1/3 md:w-1/4 lg:w-1/6 xl:w-1/6 p-2">
+								<img src={image} class="w-full h-auto object-contain" alt={`Logo ${index + 1}`} />
 								</li>
-							))
-						}
-					</Grid>
+							))}
+						</ul>
+					}
 				</div>
 			</section>
 		</main>

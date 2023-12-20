@@ -14,6 +14,14 @@ import { documentToHtmlString } from "@contentful/rich-text-html-renderer";
 import type { BlogPost } from "../../lib/contentful";
 import { BLOCKS, MARKS } from '@contentful/rich-text-types';
 
+function capitalizeFirstLetter(input: string): string {
+  if (input.length === 0) {
+    return input; // Return the input string as-is for an empty string
+  }
+
+  return input.charAt(0).toUpperCase() + input.slice(1);
+}
+
 export async function getStaticPaths() {
   const entries = await contentfulClient.getEntries<BlogPost>({
     content_type: "blogPost",
@@ -41,18 +49,18 @@ export async function getStaticPaths() {
 
   const pages = entries.items.map((item) => ({
 
-    params: { slug: item.fields.slug },
-    props: {
-      title: item.fields.title,
-      content: documentToHtmlString(item.fields.content,options),
-      date: new Date(item.fields.date).toLocaleDateString(),
-	  description: item.fields.description,
-	  slug: item.fields.slug,
-	  tags: item.metadata.tags
-    },
-  }));
-  return pages;
-}
+		params: { slug: item.fields.slug },
+		props: {
+		title: item.fields.title,
+		content: documentToHtmlString(item.fields.content,options),
+		date: new Date(item.fields.date).toLocaleDateString(),
+		description: item.fields.description,
+		slug: item.fields.slug,
+		tags: item.metadata.tags
+		},
+	}));
+	return pages;
+  }
 const { title, content, date, description, slug, tags } = Astro.props;
 ---
 
@@ -65,7 +73,7 @@ const { title, content, date, description, slug, tags } = Astro.props;
 					<Hero title={title} align="start">
 						<div class="details">
 							<div class="tags">
-								{tags.map((t) => <Pill>{t.sys.id}</Pill>)}
+								{tags.map((t) => <Pill>{capitalizeFirstLetter(t.sys.id)}</Pill>)}
 							</div>
 							<p class="description">{description}</p>
 						</div>
