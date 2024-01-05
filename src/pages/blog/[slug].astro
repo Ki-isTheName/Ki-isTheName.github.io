@@ -1,7 +1,4 @@
 ---
-import { getRelativeLocaleUrl } from 'astro:i18n';
-// import { type CollectionEntry, getCollection } from 'astro:content';
-
 import BaseLayout from '../../layouts/BaseLayout.astro';
 
 import ContactCTA from '../../components/ContactCTA.astro';
@@ -25,6 +22,7 @@ function capitalizeFirstLetter(input: string): string {
 export async function getStaticPaths() {
   const entries = await contentfulClient.getEntries<BlogPost>({
     content_type: "blogPost",
+	locale: "ms-MY",
   });
 
   const options = {

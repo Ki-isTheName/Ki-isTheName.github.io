@@ -3,17 +3,41 @@ import { contentfulClient } from "../lib/contentful";
 
 const { title, slug, description, date, featureImage } = Astro.props.post;
 
-const assetId = featureImage.sys.id;
+const language = Astro.props.language;
+
+
+const assetId = featureImage[language].sys.id;
 // Use the ID to fetch the actual Asset
 const asset = await contentfulClient.getAsset(assetId);
 // Extract the URL from the fetched asset
 const featureImageURL = `https:${asset.fields.file?.url}`;
 ---
 
-<a class="card" href={`/blog/${slug}`}>
-	<span class="title">{title}</span>
-	<img src={featureImageURL} alt={description} loading="lazy" decoding="async" />
+<a class="card" href={`/blog/${slug[language]}`}>
+	<span class="title">{title[language]}</span>
+	<img src={featureImageURL} alt={description[language]} loading="lazy" decoding="async" />
 </a>
+
+
+<script>
+	var selectElement = document.getElementById('language-select');
+	const postpreview = document.querySelector("postpreview");
+
+	// Define a function to handle the change event
+	function handleLanguageChange(event) {
+		// Get the selected language
+		var selectedLanguage = event.target.value;
+
+		// Now you can use the selected language throughout your page
+		console.log('Selected language: ', selectedLanguage);
+		// languageSelected.set(selectedLanguage)
+		postpreview?.setAttribute("language", selectedLanguage);
+	}
+
+	// Attach the event listener to the select element
+	selectElement?.addEventListener('change', handleLanguageChange);
+
+</script>
 
 <style>
 	.card {
