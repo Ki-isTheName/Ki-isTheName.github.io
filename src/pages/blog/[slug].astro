@@ -1,6 +1,5 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-
 import ContactCTA from '../../components/ContactCTA.astro';
 import Hero from '../../components/Hero.astro';
 import Icon from '../../components/Icon.astro';
@@ -11,56 +10,104 @@ import { documentToHtmlString } from "@contentful/rich-text-html-renderer";
 import type { BlogPost } from "../../lib/contentful";
 import { BLOCKS, MARKS } from '@contentful/rich-text-types';
 
+
 function capitalizeFirstLetter(input: string): string {
   if (input.length === 0) {
     return input; // Return the input string as-is for an empty string
   }
-
   return input.charAt(0).toUpperCase() + input.slice(1);
 }
 
 export async function getStaticPaths() {
-  const entries = await contentfulClient.getEntries<BlogPost>({
-    content_type: "blogPost",
-	locale: "ms-MY",
-  });
+	const allLocaleClient = contentfulClient.withAllLocales;
 
-  const options = {
-  renderNode: {
-    [BLOCKS.TABLE]: (node, next) => (
-      `<div class="relative overflow-x-auto shadow-md sm:rounded-lg">
-	  <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">${next(node.content)}</table>
-	  </div>
-	  `
-    ),
-	[BLOCKS.TABLE_HEADER_CELL]: (node, next) => (
-	  `<th scope="col" class="px-6 py-3">${next(node.content)}</th>`
-	),
-	[BLOCKS.TABLE_ROW]: (node, next) => (
-      `<tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">${next(node.content)}</tr>`
-    ),
-    [BLOCKS.TABLE_CELL]: (node, next) => (
-      `<td class="px-6 py-4">${next(node.content)}</td>`
-    ),
-  },
-};
+	const entries = await allLocaleClient.getEntries<BlogPost>({
+		content_type: "blogPost"
+	});
 
-  const pages = entries.items.map((item) => ({
+	
 
-		params: { slug: item.fields.slug },
-		props: {
-		title: item.fields.title,
-		content: documentToHtmlString(item.fields.content,options),
-		date: new Date(item.fields.date).toLocaleDateString(),
-		description: item.fields.description,
-		slug: item.fields.slug,
-		tags: item.metadata.tags
+	const options = (locale: string) => ({
+		renderNode: {
+			[BLOCKS.PARAGRAPH]: (node) => {
+				if (node.content && node.content.length > 0) {
+					const firstContentNode = node.content[0];
+					if (firstContentNode.marks && firstContentNode.marks.length > 0) {
+						const firstMark = firstContentNode.marks[0];
+						// console.log("MArks",firstMark)
+						if (firstMark.type === "code") {
+							// const highlightedCode = hljs.highlightAuto('<code>${firstContentNode.value}</code>').value
+							// problem displaying code
+							// return (`<Code code=${firstContentNode.value} lang="js" />`);
+							// // return `<code class="prose prose-code">${firstContentNode.value}</code>`;
+							return `<pre><code class="language-javascript">${firstContentNode.value}</code></pre>`;
+							// return `<pre class="prose prose-code bg-gray-800 text-white p-4 rounded-lg overflow-x-auto">
+							// 		<code class="language-javascript">${firstContentNode.value}</code>
+							// 		</pre>`;
+						}
+					}
+					return `<p>${firstContentNode.value}</p>`;
+				}
+				return ""; // Handle the case when node.content is empty or undefined
+			},
+			[BLOCKS.EMBEDDED_ASSET]: (node) => {
+				// console.log("Test", node.data.target.fields.file["en-US"].url)
+				let imgSrc = 'https:'+node.data.target.fields.file[locale].url;
+				return `<img src="${imgSrc}" />`;
+        	},
+			[BLOCKS.TABLE]: (node, next) => (
+			`<div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+			<table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">${next(node.content)}</table>
+			</div>
+			`
+			),
+			[BLOCKS.TABLE_HEADER_CELL]: (node, next) => (
+			`<th scope="col" class="px-6 py-3">${next(node.content)}</th>`
+			),
+			[BLOCKS.TABLE_ROW]: (node, next) => (
+			`<tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">${next(node.content)}</tr>`
+			),
+			[BLOCKS.TABLE_CELL]: (node, next) => (
+			`<td class="px-6 py-4">${next(node.content)}</td>`
+			)
 		},
-	}));
+	});
+
+	const pages = entries.items.flatMap((item) => (
+		Object.entries(item.fields.slug).map(([locale, slug]) => {
+			const contentDocument = item.fields.content[locale];
+			// const codeblock = item.fields.content[locale]?.content.marks;
+			// console.log("Codeblock",codeblock)
+			let contentHtml = '';
+			let dateStr = '';
+			if (contentDocument) {
+				contentHtml = documentToHtmlString(contentDocument, options(locale));
+			} else {
+				console.error(`Content is undefined for locale ${locale}`);
+				// Handle the error case
+			}
+			
+			return {
+				params: { 
+					slug: slug,
+					locale: locale
+				},
+				props: {
+					title: item.fields.title[locale],
+					content: contentHtml,
+					date: new Date(item.fields.date[locale]).toLocaleDateString(),
+					description: item.fields.description[locale],
+					slug: slug,
+					tags: item.metadata.tags
+				},
+			};
+		})
+	));
 	return pages;
-  }
+}
 const { title, content, date, description, slug, tags } = Astro.props;
 ---
+
 
 <BaseLayout title={title} description={description}>
 	<div class="stack gap-20">
@@ -81,6 +128,7 @@ const { title, content, date, description, slug, tags } = Astro.props;
 			<main class="wrapper">
 				<div class="stack gap-10">
 					<div class="content">
+						<!-- <Code code="console.log('Hello world!')" lang="js" /> -->
 						<article class="space-y-4" set:html={content}/>
 					</div>
 				</div>				  
@@ -121,7 +169,7 @@ const { title, content, date, description, slug, tags } = Astro.props;
 	}
 
 	.content {
-		max-width: 65ch;
+		max-width: 85ch;
 		margin-inline: auto;
 	}
 

@@ -25,6 +25,22 @@ const {
 	href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,400;0,700;1,400&family=Rubik:wght@500;600&display=swap"
 	rel="stylesheet"
 />
+<link
+  rel="stylesheet"
+  href="/highlight/highlightjs-copy.min.css"
+/>
+<link rel="stylesheet" href="/highlight/styles/atom-one-dark-reasonable.css">
+<script is:inline src="/highlight/highlight.min.js">hljs.highlightAll();</script>
+<script is:inline src="/highlight/languages/javascript.min.js"></script>
+<script is:inline src="/highlight/highlightjs-copy.min.js"></script>
+<script is:inline>
+	hljs.highlightAll();
+	hljs.addPlugin(
+		new CopyButtonPlugin({
+			callback: (text, el) => console.log("Copied to clipboard!", text),
+		})
+	);
+</script>
 <script is:inline>
 	// This code is inlined in the head to make dark mode instant & blocking.
 	const getThemePreference = () => {

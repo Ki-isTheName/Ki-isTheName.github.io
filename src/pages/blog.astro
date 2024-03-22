@@ -4,17 +4,21 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 
 import ContactCTA from '../components/ContactCTA.astro';
-import PostPreview from '../components/PostPreview.astro';
+import Post from '../components/PostPreview.svelte';
+import Languages from '../components/Languages.svelte';
+
 import Hero from '../components/Hero.astro';
 import Grid from '../components/Grid.astro';
 import { contentfulClient } from "../lib/contentful";
 import type { BlogPost } from "../lib/contentful";
 
-const entries = await contentfulClient.getEntries<BlogPost>({
-  content_type: "blogPost",
+const allLocaleClient = contentfulClient.withAllLocales;
+
+const blogs = await allLocaleClient.getEntries<BlogPost>({
+	content_type: "blogPost"
 });
 
-const posts = entries.items.map((item) => {
+const posts = blogs.items.map((item) => {
 //   const { title, date, description, slug, feature_image} = item.fields;
   return {
     title: item.fields.title,
@@ -34,6 +38,7 @@ const posts = entries.items.map((item) => {
 >
 	<div class="stack gap-20">
 		<main class="wrapper stack gap-8">
+			<Languages  client:only="svelte" />
 			<Hero
 				title="My Blog"
 				tagline="Sharing my knowledge and experiences"
@@ -41,9 +46,9 @@ const posts = entries.items.map((item) => {
 			/>
 			<Grid variant="offset">
 				{
-					posts.map((post) =>(
+					posts.map((post) => (
 						<li>
-							<PostPreview post={post} />
+							<Post client:only="svelte" post={post}/>
 						</li>
 					))
 				}

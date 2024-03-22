@@ -1,17 +1,15 @@
 ---
 import { getCollection } from 'astro:content';
-
 // Layout import — provides basic page elements: <head>, <nav>, <footer> etc.
 import BaseLayout from '../layouts/BaseLayout.astro';
-
 // Component Imports
 import CallToAction from '../components/CallToAction.astro';
 import Grid from '../components/Grid.astro';
 import Hero from '../components/Hero.astro';
 import Icon from '../components/Icon.astro';
 import Pill from '../components/Pill.astro';
-import PostPreview from '../components/PostPreview.astro';
-import Languages from '../components/Languages.astro';
+import Post from '../components/PostPreview.svelte';
+import Languages from '../components/Languages.svelte';
 
 // Page section components
 import ContactCTA from '../components/ContactCTA.astro';
@@ -38,8 +36,6 @@ const posts = blogs.items.map((item) => {
   };
 });
 
-console.log(posts);
-const language = window.language;
 
 const assets = await contentfulClient.getAssets();
 const desiredTag = 'logo';
@@ -56,11 +52,11 @@ const imagesUrl = assets.items
   .map((asset) => asset.fields.file?.url);
 
 ---
-
 <BaseLayout>
 	<div class="stack gap-20 lg:gap-48">
 		<div class="wrapper stack gap-8 lg:gap-20">
 			<div>
+				<Languages  client:only="svelte" />
 			</div>
 			<header class="hero">
 				<Hero
@@ -85,8 +81,6 @@ const imagesUrl = assets.items
 
 			<Skills />
 		</div>
-		
-
 		<main class="wrapper stack gap-20 lg:gap-48">
 			<section class="section with-background with-cta">
 				<header class="section-header stack gap-2 lg:gap-4">
@@ -99,7 +93,7 @@ const imagesUrl = assets.items
 						{
 							posts.map((post) => (
 								<li>
-									<PostPreview is:inline post={post} language="en-US" />
+									<Post client:only="svelte" post={post}/>
 								</li>
 							))
 						}
@@ -123,15 +117,13 @@ const imagesUrl = assets.items
 				</header>
 
 				<div class="gallery">
-					{
-						<ul class="flex flex-wrap justify-center">
-							{imagesUrl.map((image, index) => (
-								<li class="w-1/2 sm:w-1/3 md:w-1/4 lg:w-1/6 xl:w-1/6 p-2">
-								<img src={image} class="w-full h-auto object-contain" alt={`Logo ${index + 1}`} />
-								</li>
-							))}
-						</ul>
-					}
+					<ul class="flex flex-wrap justify-center">
+						{imagesUrl.map((image) => (
+							<li class="w-1/2 sm:w-1/3 md:w-1/4 lg:w-1/6 xl:w-1/6 p-2">
+							<img src={image} class="w-full h-auto object-contain" />
+							</li>
+						))}
+					</ul>
 				</div>
 			</section>
 		</main>
